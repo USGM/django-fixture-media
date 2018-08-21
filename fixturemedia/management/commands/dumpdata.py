@@ -18,11 +18,6 @@ pre_dump = django.dispatch.Signal(providing_args=('instance',))
 
 class Command(django.core.management.commands.dumpdata.Command):
 
-    option_list = django.core.management.commands.dumpdata.Command.option_list + (
-        make_option('--outfile', dest='outfile',
-            help='Specifies the file to write the serialized items to (required)'),
-    )
-
     def save_images_for_signal(self, sender, **kwargs):
         instance = kwargs['instance']
         for field in sender._meta.fields:
@@ -64,14 +59,14 @@ class Command(django.core.management.commands.dumpdata.Command):
         Deserializer = super_deserializer
 
         django.core.serializers.register_serializer(ser_format,
-             'fixturemedia.management.commands.dumpdata')
+                                                    'fixturemedia.management.commands.dumpdata')
 
     def handle(self, *app_labels, **options):
         ser_format = options.get('format')
 
-        outfilename = options.get('outfile')
+        outfilename = options.get('output')
         if outfilename is None:
-            raise CommandError('No --outfile specified (this is a required option)')
+            raise CommandError('No --output specified (this is a required option)')
         self.target_dir = join(dirname(abspath(outfilename)), 'media')
 
         for modelclass in models_with_filefields():
